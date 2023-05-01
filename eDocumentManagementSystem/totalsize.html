@@ -1,0 +1,26 @@
+<?php
+// Connect to the database
+require 'db_connection.php';
+
+// Get the total size of files stored in the database
+$result = $conn->query('SELECT SUM(byte_size) AS total_size FROM tbl_files WHERE user_id = '$_SESSION['id']);
+$row = $result->fetch_assoc();
+$total_size_db = $row['total_size'];
+
+// Get the size of the uploaded files
+$total_size_upload = 0;
+foreach ($_FILES as $file) {
+  $total_size_upload += $file['size'];
+}
+
+// Compare the sizes
+$limit = 100000000; // 100 MB
+if ($total_size_db + $total_size_upload > $limit) {
+  echo 'error'; 
+  echo json_encode(array("total_filesize" => $total_size_db + $total_size_upload ));
+} else {
+  echo 'success'; 
+  echo json_encode(array("total_filesize" => $total_size_db + $total_size_upload ));
+
+}
+?>
